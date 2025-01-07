@@ -6,17 +6,17 @@ using System.Threading;
 
 namespace HanyoungNXClassLibrary
 {
-    public class HanyoungNXClass
+    public class HanyoungNXClass : Define
     {        
-        private SerialPort _serialPort;
-        private bool _continue = true;
-        private bool bSet_flag = false;
+        private static SerialPort _serialPort;
+        private static bool _continue = true;
+        private static bool bSet_flag = false;
 
-        private bool bThread_start;
-        private Thread readThread;
-        private string readData = string.Empty;
+        private static bool bThread_start;
+        private static Thread readThread;
+        private static string readData = string.Empty;
 
-        public void HanyoungNX_Init()
+        public static void HanyoungNX_Init()
         {
             bool bRtn = DRV_INIT();
             if (bRtn)
@@ -35,7 +35,7 @@ namespace HanyoungNXClassLibrary
             }
         }
 
-        private bool DRV_INIT()
+        private static bool DRV_INIT()
         {
             if (InitPortInfo())
             {
@@ -60,7 +60,7 @@ namespace HanyoungNXClassLibrary
             return true;
         }
 
-        private bool InitPortInfo()
+        private static bool InitPortInfo()
         {
             _serialPort = new SerialPort();
 
@@ -113,7 +113,7 @@ namespace HanyoungNXClassLibrary
             }
         }
 
-        private bool PortOpen()
+        private static bool PortOpen()
         {
             try
             {
@@ -143,7 +143,7 @@ namespace HanyoungNXClassLibrary
             }
         }
 
-        public void DRV_CLOSE()
+        public static void DRV_CLOSE()
         {
             if (bThread_start)
             {
@@ -154,7 +154,7 @@ namespace HanyoungNXClassLibrary
         }
 
         // HanyoungNX Thread //////////////////////////////////////////////////////////////////////////
-        private void Read()
+        private static void Read()
         {
             while (_continue)
             {
@@ -175,14 +175,14 @@ namespace HanyoungNXClassLibrary
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void Parameter_read()
+        private static void Parameter_read()
         {
             try
             {
                 readData = string.Empty;
 
                 // PV
-                string send_Command = string.Format("{0}{1:D2}DRS,01,0000{2}{3}", Convert.ToChar(Define.RS_STX), 1, Convert.ToChar(Define.RS_CR), Convert.ToChar(Define.RS_LF));
+                string send_Command = string.Format("{0}{1:D2}DRS,01,0000{2}{3}", Convert.ToChar(RS_STX), 1, Convert.ToChar(RS_CR), Convert.ToChar(RS_LF));
                 _serialPort.Write(send_Command);
 
                 Thread.Sleep(20);
@@ -197,7 +197,7 @@ namespace HanyoungNXClassLibrary
                         string strTmp = readData.Substring(10, 4);
                         // 16진수 string값을 10진수로 변환
                         int iDecimal = Int32.Parse(strTmp, System.Globalization.NumberStyles.HexNumber);
-                        Define.temp_PV = iDecimal * 0.1;
+                        temp_PV = iDecimal * 0.1;
                     }
                 }
             }
@@ -207,7 +207,7 @@ namespace HanyoungNXClassLibrary
             }
         }
 
-        public void set_Temp(double dVal)
+        public static void set_Temp(double dVal)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace HanyoungNXClassLibrary
 
                 int setVal = 0;
                 setVal = Convert.ToInt32(dVal * 10.0);
-                string send_Command = string.Format("{0}{1:D2}DWS,01,0103,{2:X4}{3}{4}", Convert.ToChar(Define.RS_STX), 1, setVal, Convert.ToChar(Define.RS_CR), Convert.ToChar(Define.RS_LF));
+                string send_Command = string.Format("{0}{1:D2}DWS,01,0103,{2:X4}{3}{4}", Convert.ToChar(RS_STX), 1, setVal, Convert.ToChar(RS_CR), Convert.ToChar(RS_LF));
                 Global.EventLog(send_Command);
                 _serialPort.Write(send_Command);
 
