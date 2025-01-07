@@ -165,7 +165,7 @@ namespace HanyoungNXClassLibrary
                         Parameter_read();
                     }
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
                 }
                 catch (TimeoutException)
                 {
@@ -217,12 +217,13 @@ namespace HanyoungNXClassLibrary
                 int setVal = 0;
                 setVal = Convert.ToInt32(dVal * 10.0);
                 string send_Command = string.Format("{0}{1:D2}DWS,01,0103,{2:X4}{3}{4}", Convert.ToChar(RS_STX), 1, setVal, Convert.ToChar(RS_CR), Convert.ToChar(RS_LF));
-                Global.EventLog(send_Command);
+                Global.EventLog(send_Command);               
                 _serialPort.Write(send_Command);
 
                 Thread.Sleep(20);
 
                 readData = _serialPort.ReadLine();
+                Global.EventLog(readData);
                 if (readData.Length > 1)
                 {
                     bool bFind = readData.Contains("OK");
